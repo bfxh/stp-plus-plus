@@ -52,6 +52,8 @@ def main() -> None:
     ap.add_argument("--out-root", default="runs/pretrain")
     ap.add_argument("--model", default=os.environ.get("STPP_MODEL",
                                                       "unsloth/Llama-3.2-1B-Instruct"))
+    ap.add_argument("--load_8bit", action="store_true",
+                    help="8GB 卡低显存路径；与 bf16 结果不可直接比较")
     a = ap.parse_args()
 
     rows = []
@@ -69,6 +71,8 @@ def main() -> None:
                        "--block", str(a.block), "--seed", str(seed)]
                 for k, v in ARMS[arm].items():
                     cmd += [f"--{k}", str(v)]
+                if a.load_8bit:
+                    cmd += ["--load_8bit"]
                 print(f"\n=== {tag} ===", flush=True)
                 out.mkdir(parents=True, exist_ok=True)
                 env = dict(os.environ, PYTHONPATH=str(ROOT), TOKENIZERS_PARALLELISM="false")

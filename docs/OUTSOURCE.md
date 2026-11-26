@@ -6,9 +6,9 @@
 
 ## 0. 一句话
 
-在一台有 NVIDIA GPU 的机器上跑 **9 个训练**（3 个臂 × 3 个 seed），每个约 2–4 分钟，把三组困惑度（ppl）填出来。总 GPU 占用 **约 40–60 分钟**，云上成本 **< 2 美元**。
+在一台有 NVIDIA GPU 的机器上跑 **9 个训练**（3 个臂 × 3 个 seed）就能回答核心问题；顺手把另外 9 个补齐则为 18 个。本机（RTX 4060 Ti 8GB）实测每个 run **约 3 分钟**（含加载与评测），**9 个约 30 分钟，18 个约 55 分钟**；加首次下载模型与切块，总占用 **1 小时上下**，云上成本 **< 3 美元**。
 
-这份工作是回答一个特定的科学问题，**不是调模型、不是追指标**：见第 5 节的判定标准。数值好坏都接受，要的是按协议跑完并如实回报。
+这份工作是回答一个特定的科学问题，**不是调模型、不是追指标**：判定标准见第 5 节。数值好坏都接受，要的是按协议跑完并如实回报。
 
 ---
 
@@ -36,7 +36,10 @@ pip install -r requirements.txt
 # 官方仓库自带数据集（只需 datasets/ 下的 jsonl）
 git clone --depth 1 https://github.com/galilai-group/llm-jepa data/llm-jepa
 
-# 跑 9 个 run（失败会自动重试，OOM 的 run 不会留下 run.json）
+# 跑 9 个 run（决定性三臂）
+STPP_CORE_ONLY=1 bash scripts/run_control.sh
+
+# 或 18 个（把 MTP 剂量曲线一起补完）
 bash scripts/run_control.sh
 
 # 出表
@@ -68,13 +71,21 @@ python scripts\agg_pretrain.py
 
 ---
 
-## 3. 要跑的三个臂（其余臂已经在仓库里）
+## 3. 要跑的臂（其余臂已经在仓库里）
+
+**决定性三臂（必须跑，9 个 run）**
 
 | arm | 含义 |
 |---|---|
 | `ce33` | 基线：**CE 只监督每 3 个 token 中的一个**（其余标签置 −100），没有别的目标 |
-| `ce33_mtp2` | 同样 1/3 的 CE，**加上 multi-token prediction**：`h_t` 额外预测 `t+2`，权重 0.05 |
-| `mtp2` | 全 CE + 同一个 MTP 项，用来量"MTP 在监督充足时是不是纯成本" |
+| `ce33_mtp2` | 同样的 1/3 CE，**加上 multi-token prediction**：`h_t` 额外预测 `t+2`，权重 0.05 |
+| `mtp2` | 全量 CE + 同一个 MTP 项，用来量"MTP 在监督充足时是不是纯成本" |
+
+**加分项（想一次做完就一起跑，9 个 run）**
+
+`mtp3_s37`、`ce25_mtp3_s82`、`ce25_mtp3_s23`（补齐已有的两个臂到 3 seed），
+`mtp3_l` ×3、`ce25_mtp3_l` ×3（λ 从 0.15 降到 0.05 的剂量点）。
+名字都在 `scripts/run_pretrain.py` 的 `ARMS` 里，脚本会自动跳过已经存在的 run。
 
 背景一句话：仓库里的 `RESULTS.md §11` 已证明 STP 的几何目标在缺口测试里只补回 3%。但那个测法本身需要**正例对照**才能成立 —— 如果连一个确定携带信息的 MTP 都补不回来，说明测法测的是"学习成本"而不是"信息量"。这三条臂就是来分这个岔的。
 
@@ -108,7 +119,7 @@ mtp2          3       3.3x      # 新增
 
 **交付要求：**
 
-1. `runs/pretrain/ce33_s{82,23,37}/`、`ce33_mtp2_s{82,23,37}/`、`mtp2_s{82,23,37}/` 九个目录，每个里面至少有 `run.json`（含 `eval.ppl`）和 `train.jsonl`（≥ 5 行）；
+1. 九个目录：`runs/pretrain/ce33_s{82,23,37}/`、`ce33_mtp2_s{82,23,37}/`、`mtp2_s{82,23,37}/`（若跑了加分项，再加对应的九个），每个里面至少有 `run.json`（含 `eval.ppl`）和 `train.jsonl`（≥ 5 行）；
 2. `python scripts/agg_pretrain.py` 的完整 stdout；
 3. 一句话结论：**`ce33_mtp2` 的 ppl 比 `ce33` 低了多少**（正数=更差，负数=更好）。
 
@@ -118,7 +129,7 @@ mtp2          3       3.3x      # 新增
 
 ## 6. 已知坑（都是实测踩过的）
 
-1. **8GB 卡容易被 OOM 打死**：bf16 权重 2.5GB，MTP 的三个 CE 项各留一份 logits。若只有 8GB，加 `--load_8bit`（代码已支持），但那只作为子协议参考，不能和 bf16 的臂直接比。**最好直接要 ≥12GB 的卡，省掉所有麻烦。**
+1. **8GB 卡容易被 OOM 打死**：bf16 权重 2.5GB，MTP 的几个 CE 项各留一份 logits。若只有 8GB，用 `STPP_LOAD_8BIT=1 bash scripts/run_control.sh`（等价于给 `run_pretrain.py` 加 `--load_8bit`，需先 `pip install bitsandbytes`）。8-bit 结果只能作为子协议参考，**不能和 bf16 的臂直接比**。最好直接要 ≥12GB 的卡，省掉所有麻烦。
 2. **不要设 `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`**：在 Windows/WDDM 上会让 OOM 来得更早；Linux 上可留空。
 3. 首次运行慢是正常的（下载模型 + 切 15565 个 block），别以为卡住了。
 4. 失败重试是安全的：`run_pretrain.py` 见到 `run.json` 就跳过，所以重跑只会补缺的。
