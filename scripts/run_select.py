@@ -72,6 +72,9 @@ def main() -> None:
     ap.add_argument("--scores", default=str(DEFAULT_SCORES))
     ap.add_argument("--strata", type=int, default=1,
                     help="域内分层：对 i%%strata 的每组分别取子集（保持域配比）")
+    ap.add_argument("--domains", type=int, default=1,
+                    help="在 test 块上按 i%%domains 分域报告 ppl")
+    ap.add_argument("--domain-names", default="")
     ap.add_argument("--model", default=os.environ.get("STPP_MODEL",
                                                       "unsloth/Llama-3.2-1B-Instruct"))
     a = ap.parse_args()
@@ -95,6 +98,10 @@ def main() -> None:
                        "--model", a.model, "--out_dir", str(out),
                        "--steps", str(a.steps), "--bs", str(a.bs),
                        "--block", "512", "--seed", str(seed)]
+                if a.domains > 1:
+                    cmd += ["--domains", str(a.domains)]
+                    if a.domain_names:
+                        cmd += ["--domain_names", a.domain_names]
                 if arm != "all":
                     ids_f = ids_dir / f"{arm}_s{seed}.npy"
                     np.save(ids_f, pmap[arm])

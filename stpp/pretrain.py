@@ -130,6 +130,10 @@ class PreConfig:
     # 的信息压进同一个位置。用于校准 ce_stride 缺口测试是否真的能检出信息。
     mtp_k: int = 0
     mtp_weight: float = 1.0
+    # 分域评测：混合语料是 round-robin 交错的，测试块 i%domains 属于同一域。
+    # 大于 1 时额外报告每域 ppl，用来把"选数据"与"改域配比"解耦。
+    domains: int = 1
+    domain_names: str = ""
 
 
 def parse_layers(s: str) -> list[int]:
@@ -369,6 +373,14 @@ def main() -> None:
             break
 
     ppl = evaluate_ppl(model, eval_blocks, body, head, device, dtype, cfg.eval_blocks)
+    if cfg.domains > 1:
+        names = [s.strip() for s in cfg.domain_names.split(",") if s.strip()] or \
+                [f"g{g}" for g in range(cfg.domains)]
+        ppl["domains"] = {}
+        for g, name in enumerate(names[:cfg.domains]):
+            sub = eval_blocks[g::cfg.domains]
+            r = evaluate_ppl(model, sub, body, head, device, dtype, cfg.eval_blocks)
+            ppl["domains"][name] = {"ppl": r["ppl"], "ce": r["ce"], "blocks": r["blocks"]}
     # Adapters are ~50 MB per run and are not needed for the reported metrics
     # (ppl is computed in-process above). Keep them only when explicitly asked,
     # or when the sentinel file exists; otherwise skip to spare the disk.
@@ -386,6 +398,9 @@ def main() -> None:
     log.close()
     print(f"[done] {step} steps in {meta['wall_sec']}s -> ppl={ppl['ppl']:.3f} "
           f"ce={ppl['ce']:.4f}", flush=True)
+    if "domains" in ppl:
+        print("[domains] " + "  ".join(f"{k}={v['ppl']:.3f}" for k, v in ppl["domains"].items()),
+              flush=True)
 
 
 if __name__ == "__main__":

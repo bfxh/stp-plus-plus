@@ -1,0 +1,62 @@
+{
+  "config": {
+    "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+    "out_dir": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\dom_strat_nll\\selshi_s82",
+    "steps": 120,
+    "bs": 4,
+    "block": 512,
+    "train_ids": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\dom_strat_nll\\ids\\shi_s82.npy",
+    "lr": 0.0002,
+    "weight_decay": 0.0,
+    "warmup_ratio": 0.03,
+    "seed": 82,
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "lora_dropout": 0.05,
+    "grad_ckpt": true,
+    "bf16": true,
+    "log_every": 20,
+    "geom_kind": "none",
+    "lbd": 0.02,
+    "geom_layers": "-1",
+    "whiten": false,
+    "tau": 0.15,
+    "tau_adaptive": true,
+    "repulsion": 0.0,
+    "adaptive_lambda": "none",
+    "target_ratio": 0.15,
+    "eval_blocks": 200,
+    "load_8bit": false,
+    "ce_stride": 1,
+    "mtp_k": 0,
+    "mtp_weight": 1.0,
+    "domains": 3,
+    "domain_names": "code,chat,zh"
+  },
+  "steps": 120,
+  "wall_sec": 174.8,
+  "n_train_blocks": 1680,
+  "eval": {
+    "ppl": 7.449817842387669,
+    "ce": 2.0081895814063264,
+    "tokens": 102200,
+    "blocks": 200,
+    "domains": {
+      "code": {
+        "ppl": 5.9543608970287325,
+        "ce": 1.7841238749703783,
+        "blocks": 100
+      },
+      "chat": {
+        "ppl": 5.786714442494753,
+        "ce": 1.7555646767215018,
+        "blocks": 100
+      },
+      "zh": {
+        "ppl": 11.441806467320436,
+        "ce": 2.4372738814680543,
+        "blocks": 100
+      }
+    }
+  }
+}
