@@ -27,7 +27,9 @@ CACHE = Path(os.environ.get("STPP_CACHE_DIR", str(ROOT / "cache")))
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--layer", type=int, default=15)
-    ap.add_argument("--bs", type=int, default=8)
+    ap.add_argument("--bs", type=int, default=16)
+    ap.add_argument("--tokens", type=int, default=192,
+                    help="每块只用前 N 个 token 估曲率（局部量，够用）")
     ap.add_argument("--limit", type=int, default=0, help="0 = all blocks")
     ap.add_argument("--out", default="runs/curvity/train_curv.npy")
     ap.add_argument("--model", default=os.environ.get("STPP_MODEL",
@@ -36,7 +38,8 @@ def main() -> None:
 
     blocks = np.load(CACHE / "train_b512.npy", mmap_mode="r")
     n = len(blocks) if a.limit <= 0 else min(a.limit, len(blocks))
-    print(f"[score] {n} blocks of {blocks.shape[1]} tokens, layer {a.layer}", flush=True)
+    tk = min(a.tokens, blocks.shape[1])
+    print(f"[score] {n} blocks × {tk}/{blocks.shape[1]} tokens, layer {a.layer}", flush=True)
 
     model = AutoModelForCausalLM.from_pretrained(a.model, torch_dtype=torch.bfloat16,
                                                 device_map="cuda")
@@ -46,7 +49,7 @@ def main() -> None:
     scores = np.zeros(n, dtype=np.float32)
     with torch.no_grad():
         for s in range(0, n, a.bs):
-            ids = torch.as_tensor(np.asarray(blocks[s:s + a.bs]), device="cuda")
+            ids = torch.as_tensor(np.asarray(blocks[s:s + a.bs, :tk]), device="cuda")
             attn = torch.ones_like(ids)
             tap.store.clear()
             with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
