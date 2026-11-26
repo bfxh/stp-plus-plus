@@ -1,0 +1,43 @@
+{
+  "config": {
+    "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+    "out_dir": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\select\\selmid_s82",
+    "steps": 120,
+    "bs": 4,
+    "block": 512,
+    "train_ids": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\curvity\\ids\\mid_s82.npy",
+    "lr": 0.0002,
+    "weight_decay": 0.0,
+    "warmup_ratio": 0.03,
+    "seed": 82,
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "lora_dropout": 0.05,
+    "grad_ckpt": true,
+    "bf16": true,
+    "log_every": 20,
+    "geom_kind": "none",
+    "lbd": 0.02,
+    "geom_layers": "-1",
+    "whiten": false,
+    "tau": 0.15,
+    "tau_adaptive": true,
+    "repulsion": 0.0,
+    "adaptive_lambda": "none",
+    "target_ratio": 0.15,
+    "eval_blocks": 200,
+    "load_8bit": false,
+    "ce_stride": 1,
+    "mtp_k": 0,
+    "mtp_weight": 1.0
+  },
+  "steps": 120,
+  "wall_sec": 160.0,
+  "n_train_blocks": 3891,
+  "eval": {
+    "ppl": 3.410369128232277,
+    "ce": 1.2268205341854208,
+    "tokens": 102200,
+    "blocks": 200
+  }
+}
