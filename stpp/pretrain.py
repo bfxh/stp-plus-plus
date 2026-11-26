@@ -97,6 +97,8 @@ class PreConfig:
     steps: int = 300
     bs: int = 4
     block: int = 512
+    # 数据选择实验：只在这些 block 上训练。给一个 .npy（int 索引列表）；空 = 全量。
+    train_ids: str = ""
     lr: float = 2e-4
     weight_decay: float = 0.0
     warmup_ratio: float = 0.03
@@ -235,6 +237,10 @@ def main() -> None:
 
     train_blocks = build_blocks(tok, "train", cfg.block)
     eval_blocks = build_blocks(tok, "test", cfg.block)
+    if cfg.train_ids:
+        sel = np.load(cfg.train_ids)
+        print(f"[select] {len(sel)} / {len(train_blocks)} blocks from {cfg.train_ids}", flush=True)
+        train_blocks = train_blocks[sel]
 
     layers = get_layers(model)
     n_layers = len(layers)
