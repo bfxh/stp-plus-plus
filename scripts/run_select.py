@@ -22,9 +22,10 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
-SCORES = ROOT / "runs" / "curvity" / "train_curv.npy"
+DEFAULT_SCORES = ROOT / "runs" / "curvity" / "train_curv.npy"
 
-ARMS = ("rand", "hi", "lo", "mid")
+# "all" = no subset at all (the ordinary training baseline, same budget)
+ARMS = ("all", "rand", "hi", "lo", "mid")
 
 
 def pools(scores: np.ndarray, seed: int, frac: float = 0.25) -> dict[str, np.ndarray]:
@@ -48,17 +49,19 @@ def main() -> None:
     ap.add_argument("--steps", type=int, default=120)
     ap.add_argument("--bs", type=int, default=4)
     ap.add_argument("--out-root", default="runs/select")
+    ap.add_argument("--scores", default=str(DEFAULT_SCORES))
     ap.add_argument("--model", default=os.environ.get("STPP_MODEL",
                                                       "unsloth/Llama-3.2-1B-Instruct"))
     a = ap.parse_args()
 
-    scores = np.load(SCORES)
-    ids_dir = ROOT / "runs" / "curvity" / "ids"
+    scores = np.load(a.scores) if "all" not in a.arms else (
+        np.load(a.scores) if Path(a.scores).exists() else None)
+    ids_dir = ROOT / a.out_root / "ids"
     ids_dir.mkdir(parents=True, exist_ok=True)
 
     rows = []
     for seed in a.seeds:
-        pmap = pools(scores, seed)
+        pmap = pools(scores, seed) if scores is not None else {}
         for arm in a.arms:
             tag = f"sel{arm}_s{seed}"
             out = ROOT / a.out_root / tag
@@ -66,14 +69,16 @@ def main() -> None:
             if run_json.exists():
                 print(f"[skip] {tag}", flush=True)
             else:
-                ids_f = ids_dir / f"{arm}_s{seed}.npy"
-                np.save(ids_f, pmap[arm])
                 cmd = [sys.executable, "-m", "stpp.pretrain",
                        "--model", a.model, "--out_dir", str(out),
                        "--steps", str(a.steps), "--bs", str(a.bs),
-                       "--block", "512", "--seed", str(seed),
-                       "--train_ids", str(ids_f)]
-                print(f"\n=== {tag}  pool={len(pmap[arm])} ===", flush=True)
+                       "--block", "512", "--seed", str(seed)]
+                if arm != "all":
+                    ids_f = ids_dir / f"{arm}_s{seed}.npy"
+                    np.save(ids_f, pmap[arm])
+                    cmd += ["--train_ids", str(ids_f)]
+                pool_n = len(pmap[arm]) if arm != "all" else -1
+                print(f"\n=== {tag}  pool={pool_n} ===", flush=True)
                 out.mkdir(parents=True, exist_ok=True)
                 env = dict(os.environ, PYTHONPATH=str(ROOT), TOKENIZERS_PARALLELISM="false")
                 with open(out / "train.log", "w", encoding="utf-8") as f:

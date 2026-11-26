@@ -32,6 +32,8 @@ def main() -> None:
                     help="每块只用前 N 个 token 估曲率（局部量，够用）")
     ap.add_argument("--limit", type=int, default=0, help="0 = all blocks")
     ap.add_argument("--out", default="runs/curvity/train_curv.npy")
+    ap.add_argument("--save-nll", default="",
+                    help="同时把每块的基座 CE loss 存到该路径（难度对照）")
     ap.add_argument("--model", default=os.environ.get("STPP_MODEL",
                                                       "unsloth/Llama-3.2-1B-Instruct"))
     a = ap.parse_args()
@@ -47,6 +49,7 @@ def main() -> None:
     tap = HiddenTap(get_layers(model), [a.layer])
 
     scores = np.zeros(n, dtype=np.float32)
+    nll = np.zeros(n, dtype=np.float32) if a.save_nll else None
     with torch.no_grad():
         for s in range(0, n, a.bs):
             ids = torch.as_tensor(np.asarray(blocks[s:s + a.bs, :tk]), device="cuda")
@@ -54,7 +57,20 @@ def main() -> None:
             tap.store.clear()
             with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
                 with tap:
-                    model(input_ids=ids, attention_mask=attn)
+                    logits = model(input_ids=ids, attention_mask=attn).logits
+            if nll is not None:
+                lg = logits[:, :-1]
+                tgt = ids[:, 1:].long()
+                tot = torch.zeros(len(ids), device=logits.device, dtype=torch.float32)
+                cnt = 0
+                for t0 in range(0, lg.shape[1], 32):
+                    sl = lg[:, t0:t0 + 32].float().reshape(-1, lg.shape[-1])
+                    c = torch.nn.functional.cross_entropy(
+                        sl, tgt[:, t0:t0 + 32].reshape(-1), reduction="none")
+                    tot += c.view(len(ids), -1).sum(dim=1)
+                    cnt += min(32, lg.shape[1] - t0)
+                nll[s:s + len(ids)] = (tot / cnt).cpu().numpy()
+                del logits, lg
             h = tap.store[a.layer].float()
             v1 = h[:, 1:-1] - h[:, :-2]
             v2 = h[:, 2:] - h[:, 1:-1]
@@ -66,9 +82,14 @@ def main() -> None:
     out = ROOT / a.out
     out.parent.mkdir(parents=True, exist_ok=True)
     np.save(out, scores)
+    if nll is not None:
+        np.save(ROOT / a.save_nll, nll)
     q = {f"p{p}": float(np.percentile(scores, p)) for p in (1, 10, 25, 50, 75, 90, 99)}
     summary = {"n": int(n), "layer": a.layer, "mean": float(scores.mean()),
                "sd": float(scores.std()), "quantiles": q}
+    if nll is not None:
+        summary["nll_mean"] = float(nll.mean())
+        summary["corr_curv_nll"] = float(np.corrcoef(scores, nll)[0, 1])
     (out.parent / "curv_summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     print("[done]", json.dumps(summary, ensure_ascii=False), flush=True)

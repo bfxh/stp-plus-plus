@@ -1,0 +1,10 @@
+real corpus: wikitext-103, 6536 blocks × 512 tok = 3.35M tokens; test 300 blocks; 120 steps × bs4 = 245,760 tokens per run
+baseline full-corpus ppl = 13.1111 (n=3)
+
+arm                           n  mean_ppl      sd    delta       t
+full (all blocks)             3   13.1111  0.0157  +0.0000    0.00
+curv top 25% (bending)        3   13.1613  0.0235  +0.0502    3.70
+curv bottom 25% (straight)    3   13.1286  0.0234  +0.0174    1.29
+random 25%                    3   13.1056  0.0433  -0.0055   -0.22
+loss top 25% (hardest)        3   13.1147  0.0030  +0.0036    2.06
+loss bottom 25% (easiest)     3   13.1658  0.0389  +0.0547    2.44
