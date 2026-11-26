@@ -108,6 +108,9 @@ class PreConfig:
     lora_dropout: float = 0.05
     grad_ckpt: bool = True
     bf16: bool = True
+    # fp16 + GradScaler + 低精度累加。Ada 上 fp16 累加的张量吞吐是 fp32 累加的约 1.8x
+    # （实测 prec_probe：同一形状 17.4 -> 33.5 TFLOPS）。默认关，bf16 路径完全不变。
+    fp16: bool = False
     log_every: int = 20
     geom_kind: str = "none"
     lbd: float = 0.02
@@ -147,7 +150,8 @@ def evaluate_ppl(model, blocks, body, head, device, dtype, limit: int) -> dict:
     for i in range(min(limit, len(blocks))):
         ids = torch.as_tensor(blocks[i:i + 1], device=device)
         attn = torch.ones_like(ids)
-        with torch.autocast(device_type="cuda", dtype=dtype, enabled=(dtype == torch.bfloat16)):
+        with torch.autocast(device_type="cuda", dtype=dtype,
+                            enabled=(dtype in (torch.bfloat16, torch.float16))):
             hidden = body(input_ids=ids, attention_mask=attn).last_hidden_state
             h = body.norm(hidden) if hasattr(body, "norm") else hidden
             logits = head(h[:, :-1]).float()
@@ -205,7 +209,11 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     torch.manual_seed(cfg.seed)
     device = "cuda"
-    dtype = torch.bfloat16 if cfg.bf16 else torch.float32
+    dtype = torch.bfloat16 if cfg.bf16 else (torch.float16 if cfg.fp16 else torch.float32)
+    if cfg.fp16 and not cfg.bf16:
+        # Ada 的 fp16 张量核在"低精度累加"下才跑满；这开关只影响 fp16 路径。
+        torch.backends.cuda.matmul.allow_fp16_reduced_precision_reduction = True
+        torch.backends.cudnn.allow_tf32 = True
 
     tok = AutoTokenizer.from_pretrained(cfg.model)
     if tok.pad_token is None:
@@ -250,6 +258,10 @@ def main() -> None:
     n_layers = len(layers)
     li = [x if x >= 0 else n_layers + x for x in parse_layers(cfg.geom_layers)]
     body, head = get_body_and_head(model)
+    if os.environ.get("STPP_COMPILE") == "1":
+        # 把 3800+ 次 elementwise launch 交给 inductor 融合；形状是静态的（bs/block 固定）。
+        torch._dynamo.config.cache_size_limit = 64
+        body = torch.compile(body, mode=os.environ.get("STPP_COMPILE_MODE", "default"))
     d_model = model.config.hidden_size
 
     gcfg = GeomConfig(
@@ -264,6 +276,7 @@ def main() -> None:
     trainable += [p for p in reg.parameters() if p.requires_grad]
     opt = torch.optim.AdamW(trainable, lr=cfg.lr, weight_decay=cfg.weight_decay,
                             betas=(0.9, 0.95))
+    scaler = torch.amp.GradScaler("cuda") if (cfg.fp16 and not cfg.bf16) else None
     total_steps = cfg.steps
     warmup = max(1, int(total_steps * cfg.warmup_ratio))
 
@@ -287,12 +300,29 @@ def main() -> None:
     running = {"ntp": 0.0, "aux": 0.0, "mtp": 0.0, "n": 0}
     done = False
     order = np.random.default_rng(cfg.seed).permutation(len(train_blocks))
+    prof_on = os.environ.get("STPP_PROFILE") == "1"
+    prof = None
+    prof_steps = 0
 
     for epoch in range(999):
         for bstart in range(0, len(order), cfg.bs):
             if done:
                 break
             idx = order[bstart:bstart + cfg.bs]
+            if prof_on:
+                if step == 2:
+                    prof = torch.profiler.profile(
+                        activities=[torch.profiler.ProfilerActivity.CUDA])
+                    prof.start()
+                elif step == 5:
+                    prof.stop()
+                    ka = prof.key_averages()
+                    total = sum(e.self_device_time_total for e in ka) / 3.0
+                    print(f"[prof] 3 steps, per-step CUDA time = {total/1000:.1f} ms "
+                          f"(sum over 3 steps = {total*3/1000:.1f} ms)", flush=True)
+                    print(ka.table(sort_by="self_cuda_time_total", row_limit=30), flush=True)
+                    log.close()
+                    raise SystemExit(0)
             ids = torch.as_tensor(train_blocks[idx], device=device)
             attn = torch.ones_like(ids)
             labels = ids.clone().long()
@@ -300,7 +330,8 @@ def main() -> None:
             for g in opt.param_groups:
                 g["lr"] = lr_at(step)
 
-            with torch.autocast(device_type="cuda", dtype=dtype, enabled=(dtype == torch.bfloat16)):
+            with torch.autocast(device_type="cuda", dtype=dtype,
+                            enabled=(dtype in (torch.bfloat16, torch.float16))):
                 tap.store.clear()
                 with tap:
                     hidden = body(input_ids=ids, attention_mask=attn).last_hidden_state
@@ -340,9 +371,16 @@ def main() -> None:
                 lam = reg.lam(ntp, aux)
                 loss = (ntp + cfg.mtp_weight * mtp + lam * aux) / 1.0
 
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(trainable, 1.0)
-            opt.step()
+            if scaler is not None:
+                scaler.scale(loss).backward()
+                scaler.unscale_(opt)
+                torch.nn.utils.clip_grad_norm_(trainable, 1.0)
+                scaler.step(opt)
+                scaler.update()
+            else:
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(trainable, 1.0)
+                opt.step()
             opt.zero_grad(set_to_none=True)
 
             running["ntp"] += float(ntp.detach())
