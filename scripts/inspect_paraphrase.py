@@ -1,6 +1,6 @@
 import json, os, statistics
 
-DS = r"F:\aiwork\llm-jepa-ref\datasets"
+DS = os.environ.get("STPP_DATA_DIR", "data/llm-jepa/datasets")
 p = os.path.join(DS, "paraphrase_train.jsonl")
 n = 0
 lens = []

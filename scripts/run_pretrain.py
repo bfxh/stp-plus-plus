@@ -50,7 +50,8 @@ def main() -> None:
     ap.add_argument("--bs", type=int, default=4)
     ap.add_argument("--block", type=int, default=512)
     ap.add_argument("--out-root", default="runs/pretrain")
-    ap.add_argument("--model", default=r"F:\aiwork\models\Llama-3.2-1B-Instruct")
+    ap.add_argument("--model", default=os.environ.get("STPP_MODEL",
+                                                      "unsloth/Llama-3.2-1B-Instruct"))
     a = ap.parse_args()
 
     rows = []

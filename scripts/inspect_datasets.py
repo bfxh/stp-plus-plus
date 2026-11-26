@@ -1,6 +1,6 @@
 import json, os
 
-DS = r"F:\aiwork\llm-jepa-ref\datasets"
+DS = os.environ.get("STPP_DATA_DIR", "data/llm-jepa/datasets")
 FILES = ["spider_train.jsonl", "gsm8k_train.jsonl", "hellaswag_train.jsonl",
          "nq_open_train.jsonl", "yelp_train.jsonl", "turk_train.jsonl",
          "rotten_tomatoes_train.jsonl"]

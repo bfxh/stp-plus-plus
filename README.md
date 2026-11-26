@@ -49,39 +49,56 @@ L = 1 - cos(h_t - h_r, h_r - h_s),  s < r < t
 
 ## 3. 安装
 
-```powershell
-# 已经建好的环境（本机）
-$vp = "F:\aiwork\envs\stp\Scripts\python.exe"
-& $vp -m pip install -r requirements.txt
+```bash
+python -m venv .venv && source .venv/bin/activate     # Windows: .\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
 ```
 
-模型走 hf-mirror：`HF_ENDPOINT=https://hf-mirror.com`，缓存 `HF_HOME=F:\aiwork\hf`。
-默认模型 `unsloth/Llama-3.2-1B-Instruct`（免 gated 的镜像），显存约 5.5 GB。
+模型默认 `unsloth/Llama-3.2-1B-Instruct`（免 gated 的镜像，显存约 5.5 GB），首次运行自动下载。
+在中国大陆可 `export STPP_HF_ENDPOINT=https://hf-mirror.com` 走镜像。
+
+**所有本机路径都是可覆盖的环境变量**，代码里不再有绝对路径：
+
+| 变量 | 默认 | 用途 |
+|---|---|---|
+| `STPP_MODEL` | `unsloth/Llama-3.2-1B-Instruct` | 模型目录或 HF id |
+| `STPP_DATA_DIR` | `data/llm-jepa/datasets` | 官方仓库的 `*_{train,test}.jsonl` |
+| `STPP_CACHE_DIR` | `cache` | 预训练语料的 512-token 切块缓存 |
+| `STPP_HF_HOME` | `~/.cache/hf` | 模型缓存目录 |
+| `STPP_HF_ENDPOINT` | 空（官方源） | 镜像地址 |
+| `STPP_PYTHON` | `python` | `.ps1` 助手脚本用的解释器 |
+
+> 这台开发机若要复跑，先设 `STPP_MODEL=F:\aiwork\models\Llama-3.2-1B-Instruct`、`STPP_DATA_DIR=F:\aiwork\llm-jepa-ref\datasets`、`STPP_HF_HOME=F:\aiwork\hf`，否则会把 2.4GB 权重重新下到 C:（C: 只剩 5.9GB）。
+
+**只想跑某一组实验、不想读全文？** 见 `docs/OUTSOURCE.md`：那是给外人的一页任务书（含协议常数、验收标准、已知坑、时间与成本）。
 
 ---
 
 ## 4. 跑
 
-```powershell
-$env:PYTHONPATH = "C:\Users\lbx13\Doubao\chats\2026-11-24\new-chat-7\stp-plus-plus"
-$vp = "F:\aiwork\envs\stp\Scripts\python.exe"
+```bash
+# 任意平台（Linux 示例；Windows 把 python 换成 .\.venv\Scripts\python.exe）
+export PYTHONPATH=$(pwd)
 
 # 单次训练
-& $vp -m stpp.train --geom_kind stp_random_span --lbd 0.02 `
-    --train_file F:\aiwork\llm-jepa-ref\datasets\synth_train.jsonl `
+python -m stpp.train --geom_kind stp_random_span --lbd 0.02 \
+    --train_file data/llm-jepa/datasets/synth_train.jsonl \
     --out_dir runs/stp_seed82 --epochs 4 --seed 82 --bs 8 --lr 2e-4
 
 # 评测（exact-match + 碰撞率 + 轨迹 dump）
-& $vp -m stpp.evaluate --adapter runs/stp_seed82/adapter `
-    --test_file F:\aiwork\llm-jepa-ref\datasets\synth_test.jsonl `
+python -m stpp.evaluate --adapter runs/stp_seed82/adapter \
+    --test_file data/llm-jepa/datasets/synth_test.jsonl \
     --out runs/stp_seed82/eval.json --limit 300 --dump_traj
 
 # 直线 vs 曲线检验
-& $vp -m stpp.probe --traj runs/stp_seed82/eval.traj.npz --out runs/stp_seed82/probe.json
+python -m stpp.probe --traj runs/stp_seed82/eval.traj.npz --out runs/stp_seed82/probe.json
 
 # 矩阵（冒烟 / 正式）
-& $vp scripts/run_matrix.py --smoke
-& $vp scripts/run_matrix.py --fractions 1.0 0.25 0.0625 --seeds 82 23 37 --epochs 4
+python scripts/run_matrix.py --smoke
+python scripts/run_matrix.py --fractions 1.0 0.25 0.0625 --seeds 82 23 37 --epochs 4
+
+# 预训练区制 + 缺口测试（§10–§13）
+python scripts/run_pretrain.py --arms reg stp goal_pred --seeds 82 23 37
 ```
 
 ---

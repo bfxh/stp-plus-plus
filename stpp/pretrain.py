@@ -20,7 +20,7 @@ import json
 import math
 import os
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 import numpy as np
@@ -31,8 +31,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from .geometry import GeomConfig, GeometricRegularizer
 from .train import HiddenTap, chunked_ce, get_body_and_head, get_layers
 
-DS = Path(r"F:\aiwork\llm-jepa-ref\datasets")
-CACHE = Path(r"F:\aiwork\pretrain_cache")
+DS = Path(os.environ.get("STPP_DATA_DIR", "data/llm-jepa/datasets"))
+CACHE = Path(os.environ.get("STPP_CACHE_DIR", "cache"))
 
 
 # --------------------------------------------------------------------------------------
@@ -90,7 +90,9 @@ def build_blocks(tok, split: str, block: int = 512) -> np.ndarray:
 # --------------------------------------------------------------------------------------
 @dataclass
 class PreConfig:
-    model: str = r"F:\aiwork\models\Llama-3.2-1B-Instruct"
+    model: str = field(
+        default_factory=lambda: os.environ.get("STPP_MODEL", "unsloth/Llama-3.2-1B-Instruct")
+    )
     out_dir: str = "runs/pretrain/run"
     steps: int = 300
     bs: int = 4

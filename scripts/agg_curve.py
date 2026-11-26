@@ -12,7 +12,7 @@ import math
 from collections import defaultdict
 from pathlib import Path
 
-ROOT = Path(r"C:\Users\lbx13\Doubao\chats\2026-11-24\new-chat-7\stp-plus-plus")
+ROOT = Path(__file__).resolve().parent.parent
 ROOTS = ["runs\\curve", "runs\\regime", "runs\\seeds5", "runs\\pilot"]
 ARMS = ["reg", "stp", "goal_pred", "curv_budget", "stpp", "stpp_pred"]
 

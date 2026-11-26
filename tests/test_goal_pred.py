@@ -2,7 +2,7 @@
 import sys
 import torch
 
-sys.path.insert(0, r"C:\Users\lbx13\Doubao\chats\2026-11-24\new-chat-7\stp-plus-plus")
+sys.path.insert(0, __import__("pathlib").Path(__file__).resolve().parent.parent.as_posix())
 from stpp.geometry import LatentPredictor, goal_prediction, GeomConfig, GeometricRegularizer
 
 torch.manual_seed(0)

@@ -1,6 +1,6 @@
 import json, math, pathlib
 
-R = pathlib.Path(r"C:\Users\lbx13\Doubao\chats\2026-11-24\new-chat-7\stp-plus-plus\runs\pretrain")
+R = pathlib.Path(__file__).resolve().parent.parent / "runs" / "pretrain"
 rows = {}
 for p in R.glob("*_s*/run.json"):
     tag = p.parent.name

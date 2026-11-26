@@ -7,3 +7,6 @@ numpy>=1.26
 safetensors>=0.4
 sentencepiece>=0.2
 tokenizers>=0.19
+
+# 可选：只有显存 < 8GB 要用 --load_8bit 时才需要
+# bitsandbytes>=0.44

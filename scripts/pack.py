@@ -1,6 +1,6 @@
 import pathlib, zipfile, sys
 
-ROOT = pathlib.Path(r"C:\Users\lbx13\Doubao\chats\2026-11-24\new-chat-7\stp-plus-plus")
+ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT.parent / "stp-plus-plus.zip"
 
 code_globs = ["*.py", "*.md", "*.ps1", "*.txt", "*.toml", "*.cfg"]

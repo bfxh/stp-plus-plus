@@ -49,7 +49,7 @@ SMOKE_ARMS = ["reg", "stp", "curv_budget"]
 
 def run_cmd(cmd: list[str], log_path: Path) -> int:
     env = dict(os.environ, PYTHONPATH=str(ROOT), TOKENIZERS_PARALLELISM="false",
-               HF_HOME=os.environ.get("HF_HOME", r"F:\aiwork\hf"))
+               HF_HOME=os.environ.get("HF_HOME", str(Path.home() / ".cache" / "hf")))
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with open(log_path, "w", encoding="utf-8") as f:
         p = subprocess.run(cmd, cwd=str(ROOT), env=env, stdout=f, stderr=subprocess.STDOUT)
@@ -58,9 +58,12 @@ def run_cmd(cmd: list[str], log_path: Path) -> int:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--model", default="unsloth/Llama-3.2-1B-Instruct")
-    ap.add_argument("--train", default=r"F:\aiwork\llm-jepa-ref\datasets\synth_train.jsonl")
-    ap.add_argument("--test", default=r"F:\aiwork\llm-jepa-ref\datasets\synth_test.jsonl")
+    ap.add_argument("--model", default=os.environ.get("STPP_MODEL",
+                                                      "unsloth/Llama-3.2-1B-Instruct"))
+    ap.add_argument("--train", default=os.environ.get(
+        "STPP_SYNTH_TRAIN", "data/llm-jepa/datasets/synth_train.jsonl"))
+    ap.add_argument("--test", default=os.environ.get(
+        "STPP_SYNTH_TEST", "data/llm-jepa/datasets/synth_test.jsonl"))
     ap.add_argument("--arms", nargs="*", default=None)
     ap.add_argument("--fractions", nargs="*", type=float, default=[1.0, 0.25])
     ap.add_argument("--seeds", nargs="*", type=int, default=[82])

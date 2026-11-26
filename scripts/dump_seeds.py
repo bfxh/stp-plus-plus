@@ -1,6 +1,6 @@
 import json, collections, pathlib
 
-ROOT = pathlib.Path(r"C:\Users\lbx13\Doubao\chats\2026-11-24\new-chat-7\stp-plus-plus")
+ROOT = pathlib.Path(__file__).resolve().parent.parent
 rows = json.loads((ROOT / "runs" / "seeds5" / "results.json").read_text(encoding="utf-8"))
 
 d = collections.defaultdict(dict)
