@@ -265,6 +265,10 @@ def main() -> None:
                         "gate_proj", "up_proj", "down_proj"],
     ))
     model.print_trainable_parameters()
+    if os.environ.get("STPP_FUSE_MLP") == "1":
+        from .fuse_mlp import fuse_mlp
+        n_fused = fuse_mlp(model)
+        print(f"[fuse-mlp] gate+up fused in {n_fused} layers (one 2*d_ff wide GEMM)", flush=True)
 
     train_blocks = build_blocks(tok, "train", cfg.block)
     eval_blocks = build_blocks(tok, "test", cfg.block)
