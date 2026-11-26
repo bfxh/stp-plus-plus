@@ -28,12 +28,32 @@ DEFAULT_SCORES = ROOT / "runs" / "curvity" / "train_curv.npy"
 ARMS = ("all", "rand", "hi", "lo", "mid")
 
 
-def pools(scores: np.ndarray, seed: int, frac: float = 0.25) -> dict[str, np.ndarray]:
+def pools(scores: np.ndarray, seed: int, frac: float = 0.25,
+          strata: int = 1) -> dict[str, np.ndarray]:
+    """Subsets of the corpus. With strata>1 the quota is filled *within* each
+    interleaved group (i % strata), so the domain mix is preserved exactly."""
     n = len(scores)
     k = int(n * frac)
+    out: dict[str, np.ndarray] = {}
+    if strata > 1:
+        srand, shi, slo, smid = [], [], [], []
+        for g in range(strata):
+            gi = np.arange(g, n, strata)
+            kk = max(1, int(len(gi) * frac))
+            order = gi[np.argsort(scores[gi], kind="stable")]
+            lo_g, hi_g = order[:kk], order[-kk:]
+            mid_g = order[int(len(gi) * 0.5):int(len(gi) * 0.75)]
+            rng = np.random.default_rng(seed + 1000 * g)
+            srand.append(rng.choice(gi, size=kk, replace=False))
+            shi.append(hi_g)
+            slo.append(lo_g)
+            smid.append(mid_g)
+        out.update(srand=np.concatenate(srand), shi=np.concatenate(shi),
+                   slo=np.concatenate(slo), smid=np.concatenate(smid))
+        return out
+
     order = np.argsort(scores, kind="stable")
-    lo = order[:k]
-    hi = order[-k:]
+    lo, hi = order[:k], order[-k:]
     q1, q3 = int(n * 0.5), int(n * 0.75)
     mid = order[q1:q3]
     rng = np.random.default_rng(seed)
@@ -50,6 +70,8 @@ def main() -> None:
     ap.add_argument("--bs", type=int, default=4)
     ap.add_argument("--out-root", default="runs/select")
     ap.add_argument("--scores", default=str(DEFAULT_SCORES))
+    ap.add_argument("--strata", type=int, default=1,
+                    help="域内分层：对 i%%strata 的每组分别取子集（保持域配比）")
     ap.add_argument("--model", default=os.environ.get("STPP_MODEL",
                                                       "unsloth/Llama-3.2-1B-Instruct"))
     a = ap.parse_args()
@@ -61,7 +83,7 @@ def main() -> None:
 
     rows = []
     for seed in a.seeds:
-        pmap = pools(scores, seed) if scores is not None else {}
+        pmap = pools(scores, seed, strata=a.strata) if scores is not None else {}
         for arm in a.arms:
             tag = f"sel{arm}_s{seed}"
             out = ROOT / a.out_root / tag

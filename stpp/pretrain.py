@@ -369,8 +369,14 @@ def main() -> None:
             break
 
     ppl = evaluate_ppl(model, eval_blocks, body, head, device, dtype, cfg.eval_blocks)
-    model.save_pretrained(out_dir / "adapter")
-    tok.save_pretrained(out_dir / "adapter")
+    # Adapters are ~50 MB per run and are not needed for the reported metrics
+    # (ppl is computed in-process above). Keep them only when explicitly asked,
+    # or when the sentinel file exists; otherwise skip to spare the disk.
+    keep = os.environ.get("STPP_SAVE_ADAPTER", "") == "1" or \
+        (Path(__file__).resolve().parent.parent / "runs" / ".keep_adapter").exists()
+    if keep:
+        model.save_pretrained(out_dir / "adapter")
+        tok.save_pretrained(out_dir / "adapter")
     if reg.predictor is not None:
         torch.save(reg.predictor.state_dict(), out_dir / "predictor.pt")
     meta = {"config": asdict(cfg), "steps": step, "wall_sec": round(time.time() - t0, 1),
