@@ -1,5 +1,7 @@
 # STP++
 
+> **待认领的任务 → [Issues #1](https://github.com/bfxh/stp-plus-plus/issues/1)**：跑 9 个 run（约 30 分钟，需 ≥12GB 显卡），把 §11 的正例对照补完。任务书：[docs/OUTSOURCE.md](docs/OUTSOURCE.md)。
+
 把 **Semantic Tube Prediction**（Huang / LeCun / Balestriero, [arXiv:2602.22617](https://arxiv.org/abs/2602.22617)）复现出来，并在它最脆的几处换成更硬的假设，做成可一键消融的单卡实验台。
 
 > 官方实现（[galilai-group/llm-jepa](https://github.com/galilai-group/llm-jepa)）是 8 卡 FSDP + HF Trainer 的 1700 行脚本。
