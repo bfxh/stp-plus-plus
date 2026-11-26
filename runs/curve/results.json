@@ -1,0 +1,41 @@
+[
+  {
+    "tag": "goal_pred_f1_s82",
+    "arm": "goal_pred",
+    "fraction": 1.0,
+    "seed": 82,
+    "tf": {
+      "n": 300,
+      "tf_token_acc": 0.93928923988154,
+      "tf_seq_acc": 0.4266666666666667,
+      "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+      "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\curve\\goal_pred_f1_s82\\adapter"
+    }
+  },
+  {
+    "tag": "goal_pred_f1_s23",
+    "arm": "goal_pred",
+    "fraction": 1.0,
+    "seed": 23,
+    "tf": {
+      "n": 300,
+      "tf_token_acc": 0.9570582428430404,
+      "tf_seq_acc": 0.6266666666666667,
+      "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+      "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\curve\\goal_pred_f1_s23\\adapter"
+    }
+  },
+  {
+    "tag": "goal_pred_f1_s37",
+    "arm": "goal_pred",
+    "fraction": 1.0,
+    "seed": 37,
+    "tf": {
+      "n": 300,
+      "tf_token_acc": 0.9439782823297137,
+      "tf_seq_acc": 0.4866666666666667,
+      "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+      "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\curve\\goal_pred_f1_s37\\adapter"
+    }
+  }
+]

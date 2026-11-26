@@ -1,0 +1,42 @@
+{
+  "config": {
+    "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+    "train_file": "F:\\aiwork\\llm-jepa-ref\\datasets\\synth_train.jsonl",
+    "test_file": "",
+    "out_dir": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\seeds5\\reg_f0.0625_s4",
+    "epochs": 8.0,
+    "bs": 16,
+    "grad_accum": 1,
+    "lr": 0.0002,
+    "weight_decay": 0.0,
+    "warmup_ratio": 0.03,
+    "max_len": 320,
+    "fraction": 0.0625,
+    "seed": 4,
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "lora_dropout": 0.05,
+    "grad_ckpt": true,
+    "bf16": true,
+    "max_steps": 250,
+    "log_every": 10,
+    "geom_kind": "none",
+    "lbd": 0.02,
+    "geom_layers": "-1",
+    "whiten": false,
+    "anchors": "random",
+    "n_spans": 1,
+    "length_adjustment": "none",
+    "tau": 0.15,
+    "tau_adaptive": true,
+    "repulsion": 0.0,
+    "adaptive_lambda": "none",
+    "target_ratio": 0.15
+  },
+  "steps": 250,
+  "wall_sec": 111.3,
+  "n_train": 500,
+  "geom_layers": [
+    15
+  ]
+}

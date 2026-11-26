@@ -1,0 +1,542 @@
+[
+  {
+    "tag": "curv_budget_f0.0625_s82",
+    "arm": "curv_budget",
+    "fraction": 0.0625,
+    "seed": 82,
+    "run": {
+      "config": {
+        "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+        "train_file": "F:\\aiwork\\llm-jepa-ref\\datasets\\synth_train.jsonl",
+        "test_file": "",
+        "out_dir": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\curv_budget_f0.0625_s82",
+        "epochs": 8.0,
+        "bs": 16,
+        "grad_accum": 1,
+        "lr": 0.0002,
+        "weight_decay": 0.0,
+        "warmup_ratio": 0.03,
+        "max_len": 320,
+        "fraction": 0.0625,
+        "seed": 82,
+        "lora_r": 16,
+        "lora_alpha": 32,
+        "lora_dropout": 0.05,
+        "grad_ckpt": true,
+        "bf16": true,
+        "max_steps": 250,
+        "log_every": 10,
+        "geom_kind": "curvature_budget",
+        "lbd": 0.02,
+        "geom_layers": "-1",
+        "whiten": false,
+        "anchors": "random",
+        "n_spans": 1,
+        "length_adjustment": "none",
+        "tau": 0.15,
+        "tau_adaptive": true,
+        "repulsion": 0.0,
+        "adaptive_lambda": "none",
+        "target_ratio": 0.15
+      },
+      "steps": 250,
+      "wall_sec": 114.8,
+      "n_train": 500,
+      "geom_layers": [
+        15
+      ]
+    },
+    "eval": {
+      "n": 200,
+      "exact_match": 0.425,
+      "contains": 0.44,
+      "unique_ratio": 0.995,
+      "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+      "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\curv_budget_f0.0625_s82\\adapter",
+      "collision_rate": 0.0,
+      "mean_pairwise_cos_centered": -0.0201583169400692
+    },
+    "probe": {
+      "m1": {
+        "mse_linear": 3.8304457664489746,
+        "mse_mlp": 0.4275897741317749,
+        "curvature_evidence": 8.95822584678675,
+        "n": 520
+      },
+      "m2": {
+        "mse_linear": 9.261533737182617,
+        "mse_mlp": 0.6279699802398682,
+        "curvature_evidence": 14.748370190633878,
+        "n": 473
+      },
+      "m3": {
+        "mse_linear": 17.294157028198242,
+        "mse_mlp": 0.8650820255279541,
+        "curvature_evidence": 19.99134939561798,
+        "n": 426
+      }
+    },
+    "tf": {
+      "n": 300,
+      "tf_token_acc": 0.930898321816387,
+      "tf_seq_acc": 0.4266666666666667,
+      "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+      "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\curv_budget_f0.0625_s82\\adapter"
+    },
+    "exact_match": 0.425,
+    "unique_ratio": 0.995,
+    "collision_rate": 0.0,
+    "tf_token_acc": 0.930898321816387,
+    "tf_seq_acc": 0.4266666666666667
+  },
+  {
+    "tag": "curv_budget_f0.25_s82",
+    "arm": "curv_budget",
+    "fraction": 0.25,
+    "seed": 82,
+    "run": {
+      "config": {
+        "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+        "train_file": "F:\\aiwork\\llm-jepa-ref\\datasets\\synth_train.jsonl",
+        "test_file": "",
+        "out_dir": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\curv_budget_f0.25_s82",
+        "epochs": 8.0,
+        "bs": 16,
+        "grad_accum": 1,
+        "lr": 0.0002,
+        "weight_decay": 0.0,
+        "warmup_ratio": 0.03,
+        "max_len": 320,
+        "fraction": 0.25,
+        "seed": 82,
+        "lora_r": 16,
+        "lora_alpha": 32,
+        "lora_dropout": 0.05,
+        "grad_ckpt": true,
+        "bf16": true,
+        "max_steps": 250,
+        "log_every": 10,
+        "geom_kind": "curvature_budget",
+        "lbd": 0.02,
+        "geom_layers": "-1",
+        "whiten": false,
+        "anchors": "random",
+        "n_spans": 1,
+        "length_adjustment": "none",
+        "tau": 0.15,
+        "tau_adaptive": true,
+        "repulsion": 0.0,
+        "adaptive_lambda": "none",
+        "target_ratio": 0.15
+      },
+      "steps": 250,
+      "wall_sec": 120.7,
+      "n_train": 2000,
+      "geom_layers": [
+        15
+      ]
+    },
+    "eval": {
+      "n": 200,
+      "exact_match": 0.48,
+      "contains": 0.49,
+      "unique_ratio": 0.995,
+      "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+      "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\curv_budget_f0.25_s82\\adapter",
+      "collision_rate": 0.0,
+      "mean_pairwise_cos_centered": -0.019856978207826614
+    },
+    "probe": {
+      "m1": {
+        "mse_linear": 3.458836555480957,
+        "mse_mlp": 0.40251514315605164,
+        "curvature_evidence": 8.593059452026619,
+        "n": 520
+      },
+      "m2": {
+        "mse_linear": 8.837207794189453,
+        "mse_mlp": 0.5675656199455261,
+        "curvature_evidence": 15.570371924637774,
+        "n": 473
+      },
+      "m3": {
+        "mse_linear": 16.032358169555664,
+        "mse_mlp": 0.7771399021148682,
+        "curvature_evidence": 20.629951088505475,
+        "n": 426
+      }
+    },
+    "tf": {
+      "n": 300,
+      "tf_token_acc": 0.9420039486673247,
+      "tf_seq_acc": 0.4533333333333333,
+      "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+      "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\curv_budget_f0.25_s82\\adapter"
+    },
+    "exact_match": 0.48,
+    "unique_ratio": 0.995,
+    "collision_rate": 0.0,
+    "tf_token_acc": 0.9420039486673247,
+    "tf_seq_acc": 0.4533333333333333
+  },
+  {
+    "tag": "reg_f0.0625_s82",
+    "arm": "reg",
+    "fraction": 0.0625,
+    "seed": 82,
+    "run": {
+      "config": {
+        "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+        "train_file": "F:\\aiwork\\llm-jepa-ref\\datasets\\synth_train.jsonl",
+        "test_file": "",
+        "out_dir": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\reg_f0.0625_s82",
+        "epochs": 8.0,
+        "bs": 16,
+        "grad_accum": 1,
+        "lr": 0.0002,
+        "weight_decay": 0.0,
+        "warmup_ratio": 0.03,
+        "max_len": 320,
+        "fraction": 0.0625,
+        "seed": 82,
+        "lora_r": 16,
+        "lora_alpha": 32,
+        "lora_dropout": 0.05,
+        "grad_ckpt": true,
+        "bf16": true,
+        "max_steps": 250,
+        "log_every": 10,
+        "geom_kind": "none",
+        "lbd": 0.02,
+        "geom_layers": "-1",
+        "whiten": false,
+        "anchors": "random",
+        "n_spans": 1,
+        "length_adjustment": "none",
+        "tau": 0.15,
+        "tau_adaptive": true,
+        "repulsion": 0.0,
+        "adaptive_lambda": "none",
+        "target_ratio": 0.15
+      },
+      "steps": 250,
+      "wall_sec": 111.8,
+      "n_train": 500,
+      "geom_layers": [
+        15
+      ]
+    },
+    "eval": {
+      "n": 200,
+      "exact_match": 0.4,
+      "contains": 0.42,
+      "unique_ratio": 0.995,
+      "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+      "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\reg_f0.0625_s82\\adapter",
+      "collision_rate": 0.0,
+      "mean_pairwise_cos_centered": -0.020115774124860764
+    },
+    "probe": {
+      "m1": {
+        "mse_linear": 3.8141262531280518,
+        "mse_mlp": 0.5033988356590271,
+        "curvature_evidence": 7.5767482619119875,
+        "n": 520
+      },
+      "m2": {
+        "mse_linear": 9.338788986206055,
+        "mse_mlp": 0.6239616274833679,
+        "curvature_evidence": 14.966928373259597,
+        "n": 473
+      },
+      "m3": {
+        "mse_linear": 17.35877227783203,
+        "mse_mlp": 0.8919095993041992,
+        "curvature_evidence": 19.462479483766113,
+        "n": 426
+      }
+    },
+    "tf": {
+      "n": 300,
+      "tf_token_acc": 0.9252221125370188,
+      "tf_seq_acc": 0.4033333333333333,
+      "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+      "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\reg_f0.0625_s82\\adapter"
+    },
+    "exact_match": 0.4,
+    "unique_ratio": 0.995,
+    "collision_rate": 0.0,
+    "tf_token_acc": 0.9252221125370188,
+    "tf_seq_acc": 0.4033333333333333
+  },
+  {
+    "tag": "reg_f0.25_s82",
+    "arm": "reg",
+    "fraction": 0.25,
+    "seed": 82,
+    "run": {
+      "config": {
+        "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+        "train_file": "F:\\aiwork\\llm-jepa-ref\\datasets\\synth_train.jsonl",
+        "test_file": "",
+        "out_dir": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\reg_f0.25_s82",
+        "epochs": 8.0,
+        "bs": 16,
+        "grad_accum": 1,
+        "lr": 0.0002,
+        "weight_decay": 0.0,
+        "warmup_ratio": 0.03,
+        "max_len": 320,
+        "fraction": 0.25,
+        "seed": 82,
+        "lora_r": 16,
+        "lora_alpha": 32,
+        "lora_dropout": 0.05,
+        "grad_ckpt": true,
+        "bf16": true,
+        "max_steps": 250,
+        "log_every": 10,
+        "geom_kind": "none",
+        "lbd": 0.02,
+        "geom_layers": "-1",
+        "whiten": false,
+        "anchors": "random",
+        "n_spans": 1,
+        "length_adjustment": "none",
+        "tau": 0.15,
+        "tau_adaptive": true,
+        "repulsion": 0.0,
+        "adaptive_lambda": "none",
+        "target_ratio": 0.15
+      },
+      "steps": 250,
+      "wall_sec": 114.1,
+      "n_train": 2000,
+      "geom_layers": [
+        15
+      ]
+    },
+    "eval": {
+      "n": 200,
+      "exact_match": 0.475,
+      "contains": 0.48,
+      "unique_ratio": 0.995,
+      "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+      "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\reg_f0.25_s82\\adapter",
+      "collision_rate": 0.0,
+      "mean_pairwise_cos_centered": -0.020109422504901886
+    },
+    "probe": {
+      "m1": {
+        "mse_linear": 3.483090400695801,
+        "mse_mlp": 0.3680785894393921,
+        "curvature_evidence": 9.46289868693742,
+        "n": 520
+      },
+      "m2": {
+        "mse_linear": 8.693641662597656,
+        "mse_mlp": 0.5444381833076477,
+        "curvature_evidence": 15.968096891700021,
+        "n": 473
+      },
+      "m3": {
+        "mse_linear": 16.81892204284668,
+        "mse_mlp": 0.7682609558105469,
+        "curvature_evidence": 21.89219940912138,
+        "n": 426
+      }
+    },
+    "tf": {
+      "n": 300,
+      "tf_token_acc": 0.9432379072063178,
+      "tf_seq_acc": 0.4533333333333333,
+      "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+      "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\reg_f0.25_s82\\adapter"
+    },
+    "exact_match": 0.475,
+    "unique_ratio": 0.995,
+    "collision_rate": 0.0,
+    "tf_token_acc": 0.9432379072063178,
+    "tf_seq_acc": 0.4533333333333333
+  },
+  {
+    "tag": "stp_f0.0625_s82",
+    "arm": "stp",
+    "fraction": 0.0625,
+    "seed": 82,
+    "run": {
+      "config": {
+        "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+        "train_file": "F:\\aiwork\\llm-jepa-ref\\datasets\\synth_train.jsonl",
+        "test_file": "",
+        "out_dir": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\stp_f0.0625_s82",
+        "epochs": 8.0,
+        "bs": 16,
+        "grad_accum": 1,
+        "lr": 0.0002,
+        "weight_decay": 0.0,
+        "warmup_ratio": 0.03,
+        "max_len": 320,
+        "fraction": 0.0625,
+        "seed": 82,
+        "lora_r": 16,
+        "lora_alpha": 32,
+        "lora_dropout": 0.05,
+        "grad_ckpt": true,
+        "bf16": true,
+        "max_steps": 250,
+        "log_every": 10,
+        "geom_kind": "stp_random_span",
+        "lbd": 0.02,
+        "geom_layers": "-1",
+        "whiten": false,
+        "anchors": "random",
+        "n_spans": 1,
+        "length_adjustment": "none",
+        "tau": 0.15,
+        "tau_adaptive": true,
+        "repulsion": 0.0,
+        "adaptive_lambda": "none",
+        "target_ratio": 0.15
+      },
+      "steps": 250,
+      "wall_sec": 117.8,
+      "n_train": 500,
+      "geom_layers": [
+        15
+      ]
+    },
+    "eval": {
+      "n": 200,
+      "exact_match": 0.345,
+      "contains": 0.36,
+      "unique_ratio": 0.99,
+      "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+      "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\stp_f0.0625_s82\\adapter",
+      "collision_rate": 0.0,
+      "mean_pairwise_cos_centered": -0.02000453509390354
+    },
+    "probe": {
+      "m1": {
+        "mse_linear": 3.78293776512146,
+        "mse_mlp": 0.44242218136787415,
+        "curvature_evidence": 8.550515603502136,
+        "n": 520
+      },
+      "m2": {
+        "mse_linear": 9.29139232635498,
+        "mse_mlp": 0.6794105768203735,
+        "curvature_evidence": 13.675666295686021,
+        "n": 473
+      },
+      "m3": {
+        "mse_linear": 17.493274688720703,
+        "mse_mlp": 0.7926520705223083,
+        "curvature_evidence": 22.069297916794344,
+        "n": 426
+      }
+    },
+    "tf": {
+      "n": 300,
+      "tf_token_acc": 0.9232477788746298,
+      "tf_seq_acc": 0.36333333333333334,
+      "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+      "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\stp_f0.0625_s82\\adapter"
+    },
+    "exact_match": 0.345,
+    "unique_ratio": 0.99,
+    "collision_rate": 0.0,
+    "tf_token_acc": 0.9232477788746298,
+    "tf_seq_acc": 0.36333333333333334
+  },
+  {
+    "tag": "stp_f0.25_s82",
+    "arm": "stp",
+    "fraction": 0.25,
+    "seed": 82,
+    "run": {
+      "config": {
+        "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+        "train_file": "F:\\aiwork\\llm-jepa-ref\\datasets\\synth_train.jsonl",
+        "test_file": "",
+        "out_dir": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\stp_f0.25_s82",
+        "epochs": 8.0,
+        "bs": 16,
+        "grad_accum": 1,
+        "lr": 0.0002,
+        "weight_decay": 0.0,
+        "warmup_ratio": 0.03,
+        "max_len": 320,
+        "fraction": 0.25,
+        "seed": 82,
+        "lora_r": 16,
+        "lora_alpha": 32,
+        "lora_dropout": 0.05,
+        "grad_ckpt": true,
+        "bf16": true,
+        "max_steps": 250,
+        "log_every": 10,
+        "geom_kind": "stp_random_span",
+        "lbd": 0.02,
+        "geom_layers": "-1",
+        "whiten": false,
+        "anchors": "random",
+        "n_spans": 1,
+        "length_adjustment": "none",
+        "tau": 0.15,
+        "tau_adaptive": true,
+        "repulsion": 0.0,
+        "adaptive_lambda": "none",
+        "target_ratio": 0.15
+      },
+      "steps": 250,
+      "wall_sec": 117.9,
+      "n_train": 2000,
+      "geom_layers": [
+        15
+      ]
+    },
+    "eval": {
+      "n": 200,
+      "exact_match": 0.425,
+      "contains": 0.435,
+      "unique_ratio": 0.995,
+      "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+      "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\stp_f0.25_s82\\adapter",
+      "collision_rate": 0.0,
+      "mean_pairwise_cos_centered": -0.019824353978037834
+    },
+    "probe": {
+      "m1": {
+        "mse_linear": 3.4861321449279785,
+        "mse_mlp": 0.39238283038139343,
+        "curvature_evidence": 8.884517555315766,
+        "n": 520
+      },
+      "m2": {
+        "mse_linear": 8.752710342407227,
+        "mse_mlp": 0.5696673393249512,
+        "curvature_evidence": 15.364599193590914,
+        "n": 473
+      },
+      "m3": {
+        "mse_linear": 15.841209411621094,
+        "mse_mlp": 0.7814870476722717,
+        "curvature_evidence": 20.270597521488728,
+        "n": 426
+      }
+    },
+    "tf": {
+      "n": 300,
+      "tf_token_acc": 0.9383020730503455,
+      "tf_seq_acc": 0.4033333333333333,
+      "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+      "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\pilot\\stp_f0.25_s82\\adapter"
+    },
+    "exact_match": 0.425,
+    "unique_ratio": 0.995,
+    "collision_rate": 0.0,
+    "tf_token_acc": 0.9383020730503455,
+    "tf_seq_acc": 0.4033333333333333
+  }
+]

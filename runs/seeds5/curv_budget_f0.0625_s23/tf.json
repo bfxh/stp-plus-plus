@@ -1,0 +1,7 @@
+{
+  "n": 300,
+  "tf_token_acc": 0.9350937808489634,
+  "tf_seq_acc": 0.5,
+  "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+  "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\seeds5\\curv_budget_f0.0625_s23\\adapter"
+}

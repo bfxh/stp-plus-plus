@@ -1,0 +1,20 @@
+# Per-run artifacts that are large and regenerable (see RESULTS.md §9 for the commands)
+runs/**/adapter/
+runs/**/predictor.pt
+runs/**/*.pt
+runs/**/*.npz
+runs/**/*.log
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# Local caches / model weights
+*.safetensors
+*.npy
+
+# OS
+.DS_Store
+Thumbs.db

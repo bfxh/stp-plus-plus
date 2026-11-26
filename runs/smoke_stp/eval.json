@@ -1,0 +1,10 @@
+{
+  "n": 40,
+  "exact_match": 0.0,
+  "contains": 0.025,
+  "unique_ratio": 1.0,
+  "model": "F:\\aiwork\\models\\Llama-3.2-1B-Instruct",
+  "adapter": "C:\\Users\\lbx13\\Doubao\\chats\\2026-11-24\\new-chat-7\\stp-plus-plus\\runs\\smoke_stp\\adapter",
+  "collision_rate": 0.0,
+  "mean_pairwise_cos_centered": -0.021506331861019135
+}
