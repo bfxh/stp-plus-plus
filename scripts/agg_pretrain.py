@@ -11,7 +11,9 @@ for p in R.glob("*_s*/run.json"):
         continue
     rows.setdefault(arm, {})[int(s)] = json.loads(p.read_text(encoding="utf-8"))["eval"]["ppl"]
 
-ORDER = ["reg", "stp", "goal_pred", "stp_l0.5", "goal_l0.5", "ce25", "ce25_goal", "ce25_stp"]
+ORDER = ["reg", "stp", "goal_pred", "stp_l0.5", "goal_l0.5",
+         "ce25", "ce25_goal", "ce25_stp",
+         "ce33", "ce33_mtp2", "mtp2", "mtp3", "ce25_mtp3", "mtp3_l", "ce25_mtp3_l"]
 print("%-12s%3s%10s%8s%9s" % ("arm", "n", "mean_ppl", "sd", "min"))
 for a in ORDER:
     if a not in rows:
@@ -47,3 +49,9 @@ paired("stp", "reg", "stp(0.02) vs reg")
 paired("goal_pred", "reg", "goal(0.02) vs reg")
 paired("stp_l0.5", "reg", "stp(0.5) vs reg")
 paired("goal_l0.5", "reg", "goal(0.5) vs reg")
+print()
+paired("ce33", "ce25", "ce33 vs ce25 (stride 3 vs 4)")
+paired("ce33_mtp2", "ce33", "ce33_mtp2 vs ce33  <-- 决定性")
+paired("mtp2", "reg", "mtp2 vs reg (全监督 + MTP)")
+paired("mtp3", "reg", "mtp3 vs reg (λ0.15)")
+paired("ce25_mtp3", "ce25", "ce25_mtp3 vs ce25")
