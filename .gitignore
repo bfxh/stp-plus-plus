@@ -4,6 +4,7 @@ runs/**/predictor.pt
 runs/**/*.pt
 runs/**/*.npz
 runs/**/*.log
+runs/**/.driver.lock
 
 # Python
 __pycache__/

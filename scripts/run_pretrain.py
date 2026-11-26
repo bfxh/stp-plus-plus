@@ -9,6 +9,33 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+LOCK = ROOT / "runs" / "pretrain" / ".driver.lock"
+
+
+def acquire_lock() -> bool:
+    """单实例锁：同一个 out-root 只允许一个驱动，防止两进程写同一目录（会互相拖慢/踩文件）。
+
+    锁文件里存 pid 与时间戳；超过 6 小时视为陈旧锁，直接接管。
+    """
+    import time
+    LOCK.parent.mkdir(parents=True, exist_ok=True)
+    for _ in range(3):
+        try:
+            fd = os.open(LOCK, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            os.write(fd, f"{os.getpid()} {time.time():.0f}".encode())
+            os.close(fd)
+            return True
+        except FileExistsError:
+            try:
+                parts = LOCK.read_text().split()
+                if len(parts) == 2 and time.time() - float(parts[1]) > 6 * 3600:
+                    LOCK.unlink()
+                    continue
+            except Exception:
+                pass
+            return False
+    return False
+
 
 ARMS = {
     "reg": dict(geom_kind="none"),
@@ -56,6 +83,19 @@ def main() -> None:
                     help="8GB 卡低显存路径；与 bf16 结果不可直接比较")
     a = ap.parse_args()
 
+    if not acquire_lock():
+        print("[lock] 已有驱动在跑同一个 out-root，本实例退出（防止两进程写同一目录）", flush=True)
+        return
+    try:
+        run_sweep(a)
+    finally:
+        try:
+            LOCK.unlink()
+        except FileNotFoundError:
+            pass
+
+
+def run_sweep(a) -> None:
     rows = []
     for arm in a.arms:
         for seed in a.seeds:

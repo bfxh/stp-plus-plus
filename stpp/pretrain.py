@@ -315,7 +315,8 @@ def main() -> None:
                     terms += [(labels, j) for j in range(2, cfg.mtp_k + 1)]
                 # 多偏移时把 chunk 减半：每个 chunk 的 logits 与 CE 中间量都小一倍，
                 # 8GB / WDDM 下才稳得住（数值不变，只是切法不同）。
-                chunk = 32 if cfg.mtp_k > 1 else 64
+                chunk = int(os.environ.get("STPP_LOGIT_CHUNK",
+                                           32 if cfg.mtp_k > 1 else 64))
                 ces = chunked_offsets(h_last, head, terms, chunk=chunk)
                 ntp = ces[0]
                 if cfg.mtp_k > 1:
