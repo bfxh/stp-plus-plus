@@ -186,8 +186,9 @@ def chunked_offsets(hidden: torch.Tensor, head: torch.nn.Module,
 
 def main() -> None:
     ap = argparse.ArgumentParser()
+    inst = PreConfig()                                # 取真实值：default_factory 字段的 .default 是 MISSING
     for f in PreConfig.__dataclass_fields__:          # type: ignore[attr-defined]
-        v = PreConfig.__dataclass_fields__[f].default
+        v = getattr(inst, f)
         if isinstance(v, bool):
             ap.add_argument(f"--{f}", action=argparse.BooleanOptionalAction, default=v)
         else:
