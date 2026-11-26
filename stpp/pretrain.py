@@ -238,19 +238,24 @@ def main() -> None:
             model.gradient_checkpointing_enable()
             model.enable_input_require_grads()
 
-    if os.environ.get("STPP_GEMM16") == "1":
-        # 让所有 2D fp16 线性层走 CUBLAS_COMPUTE_16F（Ada 上约 1.8x）。
-        from .gemm16 import linear16
-        import torch.nn.functional as _F
-        _orig_linear = _F.linear
+    if os.environ.get("STPP_GEMM16") in ("1", "2"):
+        # 1 = ctypes 版（Windows 可用，但反传有拷贝）；2 = 零拷贝 C++ 扩展（需 Linux）。
+        if os.environ.get("STPP_GEMM16") == "2":
+            from .gemm16_ext import patch_linear
+            patch_linear()
+            print("[gemm16] zero-copy C++ extension enabled for all fp16 linear layers", flush=True)
+        else:
+            from .gemm16 import linear16
+            import torch.nn.functional as _F
+            _orig_linear = _F.linear
 
-        def _lin16(x, w, b=None):
-            if x.dim() >= 2 and w.dim() == 2 and x.shape[-1] == w.shape[-1] and x.dtype == torch.float16:
-                return linear16(x, w, b)
-            return _orig_linear(x, w, b)
+            def _lin16(x, w, b=None):
+                if x.dim() >= 2 and w.dim() == 2 and x.shape[-1] == w.shape[-1] and x.dtype == torch.float16:
+                    return linear16(x, w, b)
+                return _orig_linear(x, w, b)
 
-        torch.nn.functional.linear = _lin16
-        print("[gemm16] fp16-accumulate GEMM enabled for all linear layers", flush=True)
+            torch.nn.functional.linear = _lin16
+            print("[gemm16] ctypes 16F GEMM enabled for all linear layers", flush=True)
 
     from peft import LoraConfig, get_peft_model
     model = get_peft_model(model, LoraConfig(

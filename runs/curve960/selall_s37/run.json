@@ -1,0 +1,63 @@
+{
+  "config": {
+    "model": "/mnt/f/aiwork/models/Llama-3.2-1B-Instruct",
+    "out_dir": "/mnt/c/Users/lbx13/Doubao/chats/2026-11-24/new-chat-7/stp-plus-plus/runs/curve960/selall_s37",
+    "steps": 960,
+    "bs": 4,
+    "block": 512,
+    "train_ids": "",
+    "lr": 0.0002,
+    "weight_decay": 0.0,
+    "warmup_ratio": 0.03,
+    "seed": 37,
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "lora_dropout": 0.05,
+    "grad_ckpt": true,
+    "bf16": true,
+    "fp16": false,
+    "log_every": 20,
+    "geom_kind": "none",
+    "lbd": 0.02,
+    "geom_layers": "-1",
+    "whiten": false,
+    "tau": 0.15,
+    "tau_adaptive": true,
+    "repulsion": 0.0,
+    "adaptive_lambda": "none",
+    "target_ratio": 0.15,
+    "eval_blocks": 200,
+    "load_8bit": false,
+    "ce_stride": 1,
+    "mtp_k": 0,
+    "mtp_weight": 1.0,
+    "domains": 3,
+    "domain_names": "code,chat,zh"
+  },
+  "steps": 960,
+  "wall_sec": 616.4,
+  "n_train_blocks": 6729,
+  "eval": {
+    "ppl": 6.001679585056128,
+    "ce": 1.792039360897415,
+    "tokens": 102200,
+    "blocks": 200,
+    "domains": {
+      "code": {
+        "ppl": 5.850484706817275,
+        "ce": 1.7665245136776082,
+        "blocks": 100
+      },
+      "chat": {
+        "ppl": 5.445779749761004,
+        "ce": 1.6948409508632354,
+        "blocks": 100
+      },
+      "zh": {
+        "ppl": 6.735187545375877,
+        "ce": 1.9073456558556006,
+        "blocks": 100
+      }
+    }
+  }
+}
