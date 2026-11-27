@@ -7,6 +7,8 @@ Usage:  python scripts/fit_curve.py
 import numpy as np
 
 # measured (steps, mean ppl over 3 seeds) - see docs/CURVE.md / runs/curve*
+# 3840 is measured (6.034) but excluded from the fit: training past ~1.1 epochs
+# overfits this 3.4M-token corpus, so the decay model only holds up to 1920.
 PTS = [(240, 6.380), (480, 6.158), (960, 5.989), (1920, 5.845)]
 
 N = np.array([p[0] for p in PTS], float)
@@ -26,7 +28,7 @@ sse, b, (a, c) = best
 print(f"fit: ppl = {c:.4f} + {a:.4f} * N^-{b:.3f}   (sse={sse:.2e})")
 for n, y in PTS:
     print(f"  N={n:5d}  measured {y:.4f}  fit {c + a * n ** (-b):.4f}")
-print(f"  N=3840  predict {c + a * 3840 ** (-b):.4f}")
+print(f"  N=3840  predict {c + a * 3840 ** (-b):.4f}   [measured 6.034: overfit, +0.299 vs this line]")
 
 # wall-clock -> steps -> loss, for three measured step times
 print("\nsame wall clock, three configs (bs4, 2048 tok/step):")
