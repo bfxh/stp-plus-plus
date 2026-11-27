@@ -1,14 +1,13 @@
 """Fit ppl(N) on the measured L0 curve and convert step-speed into loss.
 
-ppl(N) = c + a * N^(-b), fitted by grid search over b (exact for 3 points,
-so treat the extrapolation as a guess to be validated by the 1920 run).
+ppl(N) = c + a * N^(-b), fitted by grid search over b on four measured points.
 
 Usage:  python scripts/fit_curve.py
 """
 import numpy as np
 
-# measured (steps, mean ppl over 3 seeds) - see docs/MFU.md 24.11a / runs/curve*
-PTS = [(240, 6.380), (480, 6.158), (960, 5.989)]
+# measured (steps, mean ppl over 3 seeds) - see docs/CURVE.md / runs/curve*
+PTS = [(240, 6.380), (480, 6.158), (960, 5.989), (1920, 5.845)]
 
 N = np.array([p[0] for p in PTS], float)
 Y = np.array([p[1] for p in PTS], float)
@@ -27,7 +26,7 @@ sse, b, (a, c) = best
 print(f"fit: ppl = {c:.4f} + {a:.4f} * N^-{b:.3f}   (sse={sse:.2e})")
 for n, y in PTS:
     print(f"  N={n:5d}  measured {y:.4f}  fit {c + a * n ** (-b):.4f}")
-print(f"  N=1920  predict {c + a * 1920 ** (-b):.4f}")
+print(f"  N=3840  predict {c + a * 3840 ** (-b):.4f}")
 
 # wall-clock -> steps -> loss, for three measured step times
 print("\nsame wall clock, three configs (bs4, 2048 tok/step):")
