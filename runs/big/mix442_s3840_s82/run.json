@@ -1,0 +1,69 @@
+{
+  "config": {
+    "model": "/mnt/f/aiwork/models/Llama-3.2-1B-Instruct",
+    "out_dir": "runs/big/mix442_s3840_s82",
+    "steps": 3840,
+    "bs": 4,
+    "block": 512,
+    "train_ids": "/mnt/f/aiwork/mix_idx/mix442.npy",
+    "lr": 0.0002,
+    "weight_decay": 0.0,
+    "warmup_ratio": 0.03,
+    "seed": 82,
+    "lora_r": 64,
+    "lora_alpha": 128,
+    "rslora": false,
+    "lora_dropout": 0.05,
+    "grad_ckpt": true,
+    "bf16": true,
+    "fp16": false,
+    "optim": "adamw",
+    "muon_lr_scale": 1.0,
+    "ademamix_alpha": 5.0,
+    "ademamix_beta3": 0.9999,
+    "log_every": 160,
+    "geom_kind": "none",
+    "lbd": 0.02,
+    "geom_layers": "-1",
+    "whiten": false,
+    "tau": 0.15,
+    "tau_adaptive": true,
+    "repulsion": 0.0,
+    "adaptive_lambda": "none",
+    "target_ratio": 0.15,
+    "eval_blocks": 200,
+    "load_8bit": false,
+    "ce_stride": 1,
+    "mtp_k": 0,
+    "mtp_weight": 1.0,
+    "domains": 3,
+    "domain_names": "code,chat,zh",
+    "train_norms": false
+  },
+  "steps": 3840,
+  "wall_sec": 4818.1,
+  "n_train_blocks": 14398,
+  "eval": {
+    "ppl": 3.9124285084230737,
+    "ce": 1.3641582830918044,
+    "tokens": 102200,
+    "blocks": 200,
+    "domains": {
+      "code": {
+        "ppl": 5.336055453558024,
+        "ce": 1.674486700905279,
+        "blocks": 100
+      },
+      "chat": {
+        "ppl": 4.858888896276632,
+        "ce": 1.5808097896090691,
+        "blocks": 100
+      },
+      "zh": {
+        "ppl": 2.5389797432298185,
+        "ce": 0.9317623244433021,
+        "blocks": 100
+      }
+    }
+  }
+}
