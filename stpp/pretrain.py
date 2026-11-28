@@ -29,6 +29,7 @@ import torch.nn.functional as F
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from .geometry import GeomConfig, GeometricRegularizer
+from .optim import build_optimizer
 from .train import HiddenTap, chunked_ce, get_body_and_head, get_layers
 
 DS = Path(os.environ.get("STPP_DATA_DIR", "data/llm-jepa/datasets"))
@@ -105,12 +106,20 @@ class PreConfig:
     seed: int = 82
     lora_r: int = 16
     lora_alpha: int = 32
+    # rsLoRA：缩放改成 alpha/sqrt(r)，高秩时不会因 alpha/r 变小而削弱增量分支。
+    rslora: bool = False
     lora_dropout: float = 0.05
     grad_ckpt: bool = True
     bf16: bool = True
     # fp16 + GradScaler + 低精度累加。Ada 上 fp16 累加的张量吞吐是 fp32 累加的约 1.8x
     # （实测 prec_probe：同一形状 17.4 -> 33.5 TFLOPS）。默认关，bf16 路径完全不变。
     fp16: bool = False
+    # 优化器：adamw（基线）/ muon（动量 + Newton-Schulz 正交化，RMS 对齐到 Adam）/
+    # ademamix（beta1=0.9 + beta3=0.9999 双 EMA 混合）。见 stpp/optim.py 与 docs/SCALING.md。
+    optim: str = "adamw"
+    muon_lr_scale: float = 1.0
+    ademamix_alpha: float = 5.0
+    ademamix_beta3: float = 0.9999
     log_every: int = 20
     geom_kind: str = "none"
     lbd: float = 0.02
@@ -260,7 +269,7 @@ def main() -> None:
     from peft import LoraConfig, get_peft_model
     model = get_peft_model(model, LoraConfig(
         r=cfg.lora_r, lora_alpha=cfg.lora_alpha, lora_dropout=cfg.lora_dropout,
-        bias="none", task_type="CAUSAL_LM",
+        bias="none", task_type="CAUSAL_LM", use_rslora=cfg.rslora,
         target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
                         "gate_proj", "up_proj", "down_proj"],
     ))
@@ -297,10 +306,13 @@ def main() -> None:
 
     trainable = [p for p in model.parameters() if p.requires_grad]
     trainable += [p for p in reg.parameters() if p.requires_grad]
-    opt = torch.optim.AdamW(trainable, lr=cfg.lr, weight_decay=cfg.weight_decay,
-                            betas=(0.9, 0.95))
-    scaler = torch.amp.GradScaler("cuda") if (cfg.fp16 and not cfg.bf16) else None
     total_steps = cfg.steps
+    opt = build_optimizer(trainable, cfg.optim, cfg.lr, cfg.weight_decay,
+                          betas=(0.9, 0.95), muon_lr_scale=cfg.muon_lr_scale,
+                          ademamix_alpha=cfg.ademamix_alpha,
+                          ademamix_beta3=cfg.ademamix_beta3,
+                          t_alpha=max(1, total_steps // 2))
+    scaler = torch.amp.GradScaler("cuda") if (cfg.fp16 and not cfg.bf16) else None
     warmup = max(1, int(total_steps * cfg.warmup_ratio))
 
     def lr_at(step: int) -> float:
