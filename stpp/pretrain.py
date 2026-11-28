@@ -301,6 +301,11 @@ def main() -> None:
     n_layers = len(layers)
     li = [x if x >= 0 else n_layers + x for x in parse_layers(cfg.geom_layers)]
     body, head = get_body_and_head(model)
+    if os.environ.get("STPP_FP8") == "1":
+        # 冻结的 base linear 走 e4m3 前向（cuBLASLt 张量级缩放，实测 88 TFLOPS vs bf16 45.8）
+        from .fp8 import patch_fp8
+        n_fp8, b_fp8 = patch_fp8(model)
+        print(f"[fp8] patched {n_fp8} frozen linears to e4m3 fwd+bwd ({b_fp8/1e9:.2f} GB fp8)", flush=True)
     if os.environ.get("STPP_COMPILE") == "1":
         # 把 3800+ 次 elementwise launch 交给 inductor 融合；形状是静态的（bs/block 固定）。
         torch._dynamo.config.cache_size_limit = 64
