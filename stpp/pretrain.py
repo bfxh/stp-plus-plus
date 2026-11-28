@@ -146,6 +146,10 @@ class PreConfig:
     # 大于 1 时额外报告每域 ppl，用来把"选数据"与"改域配比"解耦。
     domains: int = 1
     domain_names: str = ""
+    # 解冻所有 1-D 参数（RMSNorm 的逐通道缩放）。低秩 ΔW=BA 只有 r 个方向，
+    # 要表示"逐通道缩放"这个对角算子需要 d 个自由度（d=2048 >> r）；
+    # 直接给 norm 权重就是把这部分容量从 rank 预算里摘出来，几乎是免费的。
+    train_norms: bool = False
 
 
 def parse_layers(s: str) -> list[int]:
@@ -273,6 +277,13 @@ def main() -> None:
         target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
                         "gate_proj", "up_proj", "down_proj"],
     ))
+    if cfg.train_norms:
+        n_norm = 0
+        for _name, p in model.named_parameters():
+            if p.ndim == 1:               # LlamaRMSNorm 的 weight（Llama 无 bias）
+                p.requires_grad_(True)
+                n_norm += p.numel()
+        print(f"[norms] unfroze {n_norm/1e6:.3f}M 1-D params (per-channel scales)", flush=True)
     model.print_trainable_parameters()
     if os.environ.get("STPP_FUSE_MLP") == "1":
         from .fuse_mlp import fuse_mlp
